@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#03050c" />
+    <meta name="description" content="Virtuelle Stadionvorschau für Rollstuhlfahrende – Prototyp und Simulation (ÜK 368)." />
+    <title>Virtual Stadium Experience · Prototyp</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  </head>
+  <body>
+    <canvas id="scene" aria-hidden="true"></canvas>
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="fade" aria-hidden="true"></div>
+
+    <div id="loader" class="loader" role="status">
+      <span class="loader-bar"><span></span></span>
+      <span class="loader-text" data-i18n="loading">Stadion wird aufgebaut …</span>
+    </div>
+
+    <!-- Startseite -->
+    <section id="start" class="screen start" aria-labelledby="start-title" hidden>
+      <header class="topbar">
+        <span class="wordmark">Virtual Stadium Experience</span>
+        <div class="topbar-right">
+          <div class="lang" role="group" aria-label="Sprache / Language">
+            <button type="button" data-lang="de">DE</button><button type="button" data-lang="en">EN</button>
+          </div>
+          <span class="sim-badge" data-i18n="sim">Simulation</span>
+        </div>
+      </header>
+      <div class="hero">
+        <p class="eyebrow" data-i18n="eyebrow"></p>
+        <h1 id="start-title" class="match">
+          <span class="team team-alb" data-i18n="teamA"></span>
+          <span class="match-sep" aria-hidden="true">–</span>
+          <span class="team team-ita" data-i18n="teamB"></span>
+        </h1>
+        <p class="lead" data-i18n="lead"></p>
+        <div class="hero-actions">
+          <button id="enter" class="btn-primary" type="button" data-i18n="enter"></button>
+          <button id="explore" class="btn-ghost btn-lg" type="button" data-i18n="explore"></button>
+        </div>
+        <p class="persona"><span class="persona-mark" aria-hidden="true"></span><span data-i18n="persona"></span></p>
+      </div>
+      <footer class="disclaimer">
+        <span data-i18n="disclaimer"></span>
+        <button id="open-log" class="btn-link small" type="button" data-i18n="testlog"></button>
+      </footer>
+    </section>
+
+    <!-- Tour -->
+    <section id="tour" class="screen tour" aria-label="Stadiontour" hidden>
+      <header class="topbar tour-top">
+        <div class="tl">
+          <button id="back" class="btn-ghost" type="button">
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
+            <span data-i18n="back"></span>
+          </button>
+        </div>
+        <ol id="progress" class="progress" aria-label="Fortschritt"></ol>
+        <div class="topbar-right">
+          <button id="help-btn" class="btn-help" type="button" aria-haspopup="dialog"><span class="help-dot" aria-hidden="true"></span><span data-i18n="help"></span></button>
+          <span class="sim-badge" data-i18n="sim"></span>
+          <button id="more-btn" class="btn-ghost more-btn" type="button" aria-expanded="false" aria-controls="more" aria-label="Mehr">•••</button>
+          <div id="more" class="more">
+            <button id="sound-btn" class="btn-ghost" type="button" aria-pressed="true"></button>
+            <div class="lang" role="group" aria-label="Sprache / Language">
+              <button type="button" data-lang="de">DE</button><button type="button" data-lang="en">EN</button>
+            </div>
+            <div class="seg more-persp" role="group">
+              <button type="button" data-persp="ego" data-i18n="ego"></button><button type="button" data-persp="third" data-i18n="third"></button>
+            </div>
+            <div class="seg more-mode" role="group">
+              <button type="button" data-mode="before" data-i18n="modeBefore"></button><button type="button" data-mode="live" data-i18n="modeLive"></button>
+            </div>
+            <button id="toggle-hud" class="btn-ghost" type="button" aria-pressed="false"></button>
+          </div>
+        </div>
+      </header>
+
+      <div id="hud" class="hud">
+        <aside id="panel" class="panel" aria-live="polite"></aside>
+
+        <nav id="map-wrap" class="map" aria-label="Stadionkarte">
+          <div class="map-head">
+            <span data-i18n="map"></span>
+            <button id="map-toggle" class="icon-btn" type="button" data-i18n-label="mapBig">
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>
+            </button>
+          </div>
+          <div id="map" class="map-canvas"></div>
+        </nav>
+
+        <div id="controls" class="controls">
+          <div class="seg" id="persp" role="group">
+            <button type="button" data-persp="ego" data-i18n="ego"></button><button type="button" data-persp="third" data-i18n="third"></button>
+          </div>
+          <div class="drive" id="drive-ctrl">
+            <button id="rev-btn" class="drive-btn" type="button"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" /></svg><span data-i18n="reverse"></span></button>
+            <button id="fwd-btn" class="drive-btn drive-main" type="button"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 10l4-4 4 4" fill="none" stroke="currentColor" stroke-width="1.8" /></svg><span data-i18n="drive"></span></button>
+            <button id="auto-btn" class="drive-btn" type="button" aria-pressed="false"></button>
+          </div>
+          <div class="seg" id="mode" role="group">
+            <button type="button" data-mode="before" data-i18n="modeBefore"></button><button type="button" data-mode="live" data-i18n="modeLive"></button>
+          </div>
+        </div>
+        <p id="hint" class="hint"></p>
+        <div id="poi" class="poi" role="status" hidden></div>
+      </div>
+    </section>
+
+    <!-- Hilfe & Notfall -->
+    <aside id="help-sheet" class="sheet" role="dialog" aria-labelledby="help-title" hidden>
+      <div class="sheet-head">
+        <h2 id="help-title" data-i18n="helpTitle"></h2>
+        <button id="help-close" class="icon-btn" type="button" data-i18n-label="close">
+          <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 3l10 10M13 3 3 13" stroke="currentColor" stroke-width="1.6" /></svg>
+        </button>
+      </div>
+      <div id="help-body"></div>
+    </aside>
+
+    <!-- Hinweisfenster -->
+    <div id="modal" class="modal" hidden>
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <h2 id="modal-title"></h2>
+        <div id="modal-body"></div>
+        <div id="modal-actions" class="modal-actions"></div>
+      </div>
+    </div>
+
+    <div id="fallback" class="fallback" role="alert" hidden>
+      <h2>3D</h2>
+      <p id="fallback-text"></p>
+    </div>
+    <div id="toast" class="toast" role="alert" hidden></div>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
